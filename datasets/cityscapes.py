@@ -86,7 +86,13 @@ class Cityscapes(data.Dataset):
         self.all_imgs=[]
         self.imgs=None
         self.num_classes=19
-
+        # print("+++++++++++++++++")
+        # print(os.path.isdir(self.images_dir))
+        # print(os.getcwd())
+        # print(self.images_dir)
+        # print(self.targets_dir)
+        # print(os.listdir(path='.'))
+        # print("+++++++++++++++++")
         if not os.path.isdir(self.images_dir) or not os.path.isdir(self.targets_dir):
             raise RuntimeError('Dataset not found or incomplete')
         if "train" in self.split:
@@ -155,7 +161,7 @@ class Cityscapes(data.Dataset):
         if target_type == 'instance':
             return '{}_instanceIds.png'.format(mode)
         elif target_type == 'semantic':
-            return '{}_labelTrainIds.png'.format(mode)
+            return '{}_labelIds.png'.format(mode)
         elif target_type == 'color':
             return '{}_color.png'.format(mode)
         else:

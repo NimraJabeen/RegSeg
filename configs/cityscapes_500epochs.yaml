@@ -37,8 +37,8 @@ benchmark_model: True
 
 #dataset
 dataset_name: cityscapes
-dataset_dir: cityscapes_dataset
-batch_size: 8
+dataset_dir: cityscapes_dataset 
+batch_size: 8  #changed from 8 originally
 train_min_size: 400
 train_max_size: 1600
 train_crop_size: [768,768]

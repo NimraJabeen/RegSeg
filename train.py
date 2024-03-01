@@ -10,7 +10,7 @@ import numpy as np
 from train_utils import get_lr_function, get_loss_fun,get_optimizer,get_dataset_loaders,get_model,get_val_dataset
 from benchmark import compute_time_full, compute_time_no_loader,compute_loader_time
 from precise_bn import compute_precise_bn_stats
-
+data_dir = "/cluster/projects/nn10058k/RegSeg/cityscapes_dataset"
 class ConfusionMatrix(object):
     def __init__(self, num_classes, exclude_classes):
         self.num_classes = num_classes
@@ -67,6 +67,7 @@ def evaluate(model, data_loader, device, confmat,mixed_precision,print_every,max
     return confmat
 
 def train_one_epoch(model, loss_fun, optimizer, loader, lr_scheduler, print_every, mixed_precision, scaler):
+    torch.backends.cudnn.enabled = False
     model.train()
     losses=0
     for t, x in enumerate(loader):
@@ -167,7 +168,11 @@ def train_multiple(configs):
 def train_one(config):
     config=check_config_files(config)
     setup_env(config)
+    
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    print("°train one°°°°°°°°°°°°°°°°")
+    print(device)
+    print("°°°°°°°°°°°°°°°°°°°°")
     save_best_path=config["save_best_path"]
     print("saving to: "+save_best_path)
     save_latest_path=config["save_latest_path"]
@@ -273,6 +278,9 @@ def validate_multiple(configs):
 def validate_one(config):
     setup_env(config)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    print("valid one°°°°°°°°°°°°°°°°")
+    print(device)
+    print("°°°°°°°°°°°°°°°°°°°°")
     train_loader, val_loader,train_set=get_dataset_loaders(config)
     model=get_model(config).to(device)
     mixed_precision=config["mixed_precision"]
@@ -354,12 +362,12 @@ def benchmark_one(config):
         val_loader_time=compute_loader_time(val_loader,warmup_iter,num_iter)
         print("train loader time:",train_loader_time)
         print("val loader time:",val_loader_time)
-
+#dataset path changed
 def benchmark_main():
     config_filename="configs/cityscapes_1000epochs.yaml"
     with open(config_filename) as file:
         config=yaml.full_load(file)
-    config["dataset_dir"]="cityscapes_dataset"
+    config["dataset_dir"]=data_dir
     config["class_uniform_pct"]=0
     config["benchmark_model"]=True
     config["benchmark_loader"]=True
@@ -369,16 +377,16 @@ def validate_main():
     config_filename="configs/cityscapes_1000epochs.yaml"
     with open(config_filename) as file:
         config=yaml.full_load(file)
-    config["dataset_dir"]="cityscapes_dataset"
+    config["dataset_dir"]=data_dir # dataset path changed defined above
     config["class_uniform_pct"]=0 # since we're only evalutaing, not training
-    config["pretrained_path"]="checkpoints/cityscapes_exp48_decoder26_train_1000_epochs_run2"
+    #config["pretrained_path"]="checkpoints/cityscapes_exp48_decoder26_train_1000_epochs_run2"
     confmat=validate_one(config)
     return confmat
 def train_main():
     config_filename= "configs/cityscapes_1000epochs.yaml"
     with open(config_filename) as file:
         config=yaml.full_load(file)
-    config["dataset_dir"]="cityscapes_dataset"
+    config["dataset_dir"]=data_dir
     train_one(config)
 def train_3runs():
     # train the same model 3 times to get error bounds
